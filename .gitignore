@@ -1,0 +1,26 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+
+# Tooling
+.idea/
+.vscode/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Builds / distributions
+build/
+dist/
+*.egg-info/
+
