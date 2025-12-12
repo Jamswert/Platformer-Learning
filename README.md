@@ -13,6 +13,16 @@ I'm using a setup with a main entry point and then packages with classes and mod
 - Python 3.10+ (other 3.x likely fine)
 - `pygame` installed (`pip install pygame`)
 
+## Level Editor
+- This is a work in progress, it takes in text files and parses it.
+- These need to be in the format of a 37 columns long by 20 rows tall text file.
+- Types:
+    - `G` - `GrassTile` location
+    - `P` - `Player` spawn location
+    - `S` - `SpikeTile` location
+    - `D` - `DirtTile` location
+    - `.` - `None`
+
 ## Next steps / ideas to extend
 - Add a player sprite with movement and gravity.
 - Implement a basic tile map and platforms.

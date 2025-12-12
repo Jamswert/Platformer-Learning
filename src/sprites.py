@@ -24,8 +24,15 @@ class Player(GameSprite):
         self.lives = PLAYER_LIVES
         self.direction_x = 0
         self.velocity_y = 0
+        self.spawn_x = x
+        self.spawn_y = y
+
         self.on_ground = False
         self.tile_sprites = None
+        self.jump_held = False  # prevents consuming multiple jumps while key is held
+        
+        self.max_jump_count = PLAYER_JUMP_COUNT
+        self.current_jumps = 0
     
     def handle_input(self, keys):
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -35,11 +42,16 @@ class Player(GameSprite):
         else:
             self.direction_x = 0
         
-        if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
+        jump_pressed = keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]
+
+        # Edge-detect jump so holding the key doesn't chain-fire jumps
+        if jump_pressed and not self.jump_held and self.current_jumps < self.max_jump_count:
             self.velocity_y = JUMP_STRENGTH
             self.on_ground = False
-        
-
+            self.current_jumps += 1
+            self.jump_held = True
+        elif not jump_pressed:
+            self.jump_held = False
 
     def update(self, delta_time):
         # Store previous position for collision detection
@@ -49,10 +61,13 @@ class Player(GameSprite):
         # Apply horizontal movement
         self.rect.x += self.direction_x * self.speed * delta_time
 
-        # Check horizontal collisions
+        # Check horizontal collisions (exclude spike tiles)
         if self.tile_sprites:
             horizontal_collisions = pygame.sprite.spritecollide(self, self.tile_sprites, False)
             for tile in horizontal_collisions:
+                # Skip spike tiles - they don't block movement, they kill
+                if isinstance(tile, SpikeTile):
+                    continue
                 if self.direction_x > 0:
                     self.rect.right = tile.rect.left
                 elif self.direction_x < 0:
@@ -62,13 +77,25 @@ class Player(GameSprite):
         self.velocity_y += GRAVITY * delta_time
         self.rect.y += self.velocity_y * delta_time
 
-        # Check vertical collisions
+        # Check for spike tile collisions (death) - check before normal collision handling
+        if self.tile_sprites:
+            spike_collisions = pygame.sprite.spritecollide(self, self.tile_sprites, False)
+            for tile in spike_collisions:
+                if isinstance(tile, SpikeTile):
+                    self.respawn()
+                    return  # Exit early to prevent further collision handling
+
+        # Check vertical collisions (exclude spike tiles)
         self.on_ground = False
         if self.tile_sprites:
             # Get all tiles the player is currently colliding with
             vertical_collisions = pygame.sprite.spritecollide(self, self.tile_sprites, False)
             
             for tile in vertical_collisions:
+                # Skip spike tiles - they don't block movement, they kill
+                if isinstance(tile, SpikeTile):
+                    continue
+                    
                 # Calculate previous bottom position
                 prev_bottom = prev_y + self.rect.height
                 
@@ -85,6 +112,7 @@ class Player(GameSprite):
                             self.rect.bottom = tile.rect.top
                             self.velocity_y = 0
                             self.on_ground = True
+                            self.current_jumps = 0
                             break
                         # If already inside, push up if more overlap from top
                         elif overlap_from_top > overlap_from_bottom:
@@ -113,10 +141,31 @@ class Player(GameSprite):
             self.rect.left = 0
         if self.rect.right > WINDOW_WIDTH:
             self.rect.right = WINDOW_WIDTH
+    
+    def respawn(self):
+        """Respawn the player at their spawn position"""
+        self.rect.x = self.spawn_x
+        self.rect.y = self.spawn_y
+        self.velocity_y = 0
+        self.current_jumps = 0
 
 class GrassTile(GameSprite):
     def __init__(self, x, y):
         super().__init__("assets/sprites/grass_tile.png", x, y, 0)
+        self.image = pygame.transform.scale(self.image, (TILE_WIDTH, TILE_HEIGHT))
+        # Recreate rect with correct size after scaling
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+class DirtTile(GameSprite):
+    def __init__(self, x, y):
+        super().__init__("assets/sprites/dirt_tile.png", x, y, 0)
+        self.image = pygame.transform.scale(self.image, (TILE_WIDTH, TILE_HEIGHT))
+        # Recreate rect with correct size after scaling
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+class SpikeTile(GameSprite):
+    def __init__(self, x, y):
+        super().__init__("assets/sprites/spike.png", x, y, 0)
         self.image = pygame.transform.scale(self.image, (TILE_WIDTH, TILE_HEIGHT))
         # Recreate rect with correct size after scaling
         self.rect = self.image.get_rect(topleft=(x, y))
