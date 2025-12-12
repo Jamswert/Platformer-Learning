@@ -6,7 +6,8 @@ I'm using a setup with a main entry point and then packages with classes and mod
 
 ## Project structure
 - `main.py` — the entry point for the project.
-- `src/game.py` — `Game` class: Handles the main game loop.
+- `src/game.py` — `Game` class: Handles the main game
+- `src/sprites.py` - Holds classes for rhe creation of a sprite and also the sprite logic such as player movement.
 - `config/config.py` — window settings (size, title, FPS) and shared colors.
 
 ## Prerequisites
