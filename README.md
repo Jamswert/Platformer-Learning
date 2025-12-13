@@ -4,31 +4,59 @@ A small OOP (Object Oriented Programming) pygame platformer that should help me 
 
 I'm using a setup with a main entry point and then packages with classes and modules when needed.
 
+## Features
+
+- **Player Movement**: Smooth horizontal movement with gravity and physics
+- **Multiple Jumps**: Double jump system (configurable jump count)
+- **Level System**: Text-based level files parsed and rendered
+- **Collision Detection**: Full collision handling for platforms, walls, and ceilings
+- **Hazard System**: Spike tiles that kill the player and trigger respawn
+- **Sound System**: Background music and sound effects (jump, death)
+- **Debug UI**: Real-time FPS and jump counter display
+- **Frame-Rate Independent**: Delta time based movement for consistent gameplay
+
 ## Project structure
 - `main.py` — the entry point for the project.
-- `src/game.py` — `Game` class: Handles the main game
-- `src/sprites.py` - Holds classes for rhe creation of a sprite and also the sprite logic such as player movement.
-- `config/config.py` — window settings (size, title, FPS) and shared colors.
+- `src/game.py` — `Game` class: Handles the main game loop, rendering, and input
+- `src/sprites.py` — Sprite classes including `Player`, `GrassTile`, `DirtTile`, and `SpikeTile` with collision logic
+- `src/levelhandler.py` — Level parsing from text files
+- `src/soundhandler.py` — Sound and music management (`SoundEffect` and `Music` classes)
+- `config/config.py` — Window settings (size, title, FPS), game constants, and shared colors
 
 ## Prerequisites
 - Python 3.10+ (other 3.x likely fine)
 - `pygame` installed (`pip install pygame`)
 
-## Level Editor
-- This is a work in progress, it takes in text files and parses it.
-- These need to be in the format of a 37 columns long by 20 rows tall text file.
-- Types:
-    - `G` - `GrassTile` location
+## Controls
+- **Movement**: `A`/`D` or `Left Arrow`/`Right Arrow` keys
+- **Jump**: `Space`, `W`, or `Up Arrow` keys
+- **Quit**: Close window or `Alt+F4`
+
+## Level Format
+Levels are stored as text files in `assets/levels/` and parsed automatically.
+
+- **Format**: Text files with characters representing tile types
+- **Tile Types**:
+    - `G` - `GrassTile` (platform)
+    - `D` - `DirtTile` (platform)
+    - `S` - `SpikeTile` (hazard - kills player on contact)
     - `P` - `Player` spawn location
-    - `S` - `SpikeTile` location
-    - `D` - `DirtTile` location
-    - `.` - `None`
+    - `.` - Empty space
+
+Example level file: `assets/levels/level1.txt`
+
+## Sound System
+- **Background Music**: Looping music tracks in `assets/sounds/music/`
+- **Sound Effects**: Jump and death sounds in `assets/sounds/sfx/`
+- Volume controls available in `soundhandler.py`
 
 ## Next steps / ideas to extend
-- Add a player sprite with movement and gravity.
-- Implement a basic tile map and platforms.
-- Learn how to make a level editor / handler (text files?)
-- Handle input for jumping and horizontal movement.
-- Track delta time (`self.delta_time`) to make movement frame-rate independent.
-- Add simple UI (FPS display) and pause/quit menu.
+- Add more level files
+- Implement collectibles or power-ups
+- Add enemy AI
+- Create a main menu system
+- Add pause functionality
+- Implement scoring system
+- Add particle effects
+- Create more tile types and hazards
 

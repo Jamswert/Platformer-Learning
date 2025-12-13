@@ -2,6 +2,7 @@ import pygame
 from config.config import *
 from src.sprites import Player, GrassTile, DirtTile, SpikeTile
 from src.levelhandler import parse_level
+from src.soundhandler import load_music
 
 class Game:
     def __init__(self):
@@ -13,6 +14,8 @@ class Game:
         self.delta_time = 0.1
         self.framerate = FPS
         self.bg_color = BG_COLOR
+        self.bg_music = load_music("assets/sounds/music/bg_music2.wav", volume=20, loop=True)
+        self.bg_music.play()
 
         pygame.display.set_caption(WINDOW_TITLE)
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))

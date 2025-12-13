@@ -1,5 +1,6 @@
 import pygame
 from config.config import *
+from src.soundhandler import load_sound
 
 class GameSprite(pygame.sprite.Sprite):
     def __init__(self, image_source, x, y, speed):
@@ -29,6 +30,9 @@ class Player(GameSprite):
 
         self.on_ground = False
         self.tile_sprites = None
+
+        self.death_sound = load_sound("assets/sounds/sfx/death.wav", volume=300)
+        self.jump_sound = load_sound("assets/sounds/sfx/jump.wav", volume=100)
         self.jump_held = False  # prevents consuming multiple jumps while key is held
         
         self.max_jump_count = PLAYER_JUMP_COUNT
@@ -49,6 +53,7 @@ class Player(GameSprite):
             self.velocity_y = JUMP_STRENGTH
             self.on_ground = False
             self.current_jumps += 1
+            self.jump_sound.play()
             self.jump_held = True
         elif not jump_pressed:
             self.jump_held = False
@@ -82,6 +87,7 @@ class Player(GameSprite):
             spike_collisions = pygame.sprite.spritecollide(self, self.tile_sprites, False)
             for tile in spike_collisions:
                 if isinstance(tile, SpikeTile):
+                    self.death_sound.play()
                     self.respawn()
                     return  # Exit early to prevent further collision handling
 
